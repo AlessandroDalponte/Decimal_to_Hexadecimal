@@ -20,39 +20,47 @@ const equiv = {
 };
 
 function decToHexadec() {
-  const decimalNumber = Number(document.querySelector(".decimalNumber").value);
+  const inputNumber = Number(document.querySelector(".decimalNumber").value);
 
-  let number;
+  let decimal;
   let rest;
-  let extraDigits = 0;
-  let hexadecimalNumber;
+  let hexadecimal = "";
 
-  number = decimalNumber;
+  decimal = Math.trunc(Math.abs(inputNumber));
 
+  // This part of the code converts the integer part of the decimal number
   do {
-    rest = number % 16;
-    number = number / 16;
-    if (decimalNumber >= 16) extraDigits++;
-  } while (number >= 16);
+    rest = decimal % 16;
+    decimal = Math.trunc(decimal / 16);
+    hexadecimal = equiv[rest] + hexadecimal;
+  } while (decimal > 0);
 
-  if (decimalNumber < 16) {
-    hexadecimalNumber = equiv[rest];
-  } else {
-    hexadecimalNumber = equiv[Math.trunc(number)];
-    for (let i = 1; i <= extraDigits; i++) {
-      number = number * 16;
-      if (rest === 0) {
-        hexadecimalNumber = hexadecimalNumber + "0";
-      } else {
-        hexadecimalNumber = hexadecimalNumber + equiv[Math.trunc(number % 16)];
-      }
-      number = number % 1;
+  // This part of the code converts the fractional part of the decimal number
+  if (inputNumber % 1 != 0) {
+    let pointDecimal = Math.abs(inputNumber % 1);
+    let pointDecimalDiv;
+    let pointHexadecimal = "";
+    let relation = 1;
+
+    for (let i = 1; i <= 9; i++) {
+      relation = relation / 16;
+      pointDecimalDiv = Math.trunc(pointDecimal / relation);
+      pointHexadecimal = pointHexadecimal + equiv[pointDecimalDiv];
+      pointDecimal = pointDecimal % relation;
     }
+
+    hexadecimal = hexadecimal + "." + pointHexadecimal;
   }
 
+  // This part prints to the screen the hexadecimal number and checks for the sign, in case it is negative
   document.querySelector(
     ".hexadecimalNumber"
-  ).textContent = `Hexadecimal: #${hexadecimalNumber}`;
+  ).textContent = `Hexadecimal: #${hexadecimal}`;
+
+  if (inputNumber < 0)
+    document.querySelector(
+      ".hexadecimalNumber"
+    ).textContent = `Hexadecimal: #-${hexadecimal}`;
 }
 
 document.querySelector(".decimalNumber").addEventListener("input", function () {
